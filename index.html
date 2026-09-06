@@ -38,7 +38,6 @@ body{
   background:
     radial-gradient(120% 60% at 50% 0%,   #FFFFFF 0%, var(--papier) 55%),
     linear-gradient(180deg, var(--papier) 60%, #EEF7E9 100%);
-  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -55,6 +54,8 @@ body{
   position: absolute;
   top: 0;
   will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   animation-name: spada;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -305,11 +306,33 @@ main{
   100% { transform: translate3d(var(--x1), var(--y1), 0) scale(.9)  rotate(var(--obrot)); opacity: 0; }
 }
 
-/* ===== 9. DOSTĘPNOŚĆ ===== */
-@media (prefers-reduced-motion: reduce){
-  *{ animation: none !important; transition: none !important; }
-  .spadajaca{ opacity: .35 !important; }
+/* ===== 9. TRYB BEZ ANIMACJI (i przełącznik) =====
+   Wcześniej blokowaliśmy tu WSZYSTKIE animacje i przejścia gwiazdką.
+   To za grubo: znikały też paski postępu, które niosą informację.
+   Teraz wyłączamy tylko dekorację, a użytkownik może to cofnąć guzikiem. */
+.bez-animacji #sad{ display: none; }
+.bez-animacji .plaster{ animation: none !important; }
+.bez-animacji #sekundy.tyk{ animation: none !important; }
+.bez-animacji .komunikat{ transition: none; }
+.bez-animacji .droga-tor i{ transition: none; }
+
+.przelacznik{
+  display: none;
+  margin: 1.4rem auto 0;
+  padding: .65rem 1.15rem;
+  font-family: inherit;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--lisc);
+  background: #fff;
+  border: 2px solid #E4F0DC;
+  border-radius: 999px;
+  cursor: pointer;
 }
+.mozna-przelaczyc .przelacznik{ display: block; }
+.przelacznik:focus-visible{ outline: 3px solid var(--cytryna); outline-offset: 2px; }
 </style>
 </head>
 
@@ -358,6 +381,8 @@ main{
     <p class="komunikat" id="komunikat">Rezerwowanie sali...</p>
     <div class="pasek"><i id="wypelnienie"></i></div>
   </div>
+
+  <button class="przelacznik" id="przelacznik" type="button">Włącz animacje</button>
 </main>
 
 <script>
@@ -702,21 +727,37 @@ function wypiszLinie(tekst){
   setTimeout(() => { k.textContent = tekst; k.classList.remove("gasnie"); }, 220);
 }
 
+/* Krzywe tempa zapisane jako zwykłe funkcje matematyczne.
+   Wcześniej były to napisy cubic-bezier() podawane do transition CSS —
+   a przejścia CSS potrafią zostać wyłączone przez system albo zgubione
+   przez Safari. Licząc szerokość samodzielnie, jesteśmy niezależni. */
+const KRZYWE = [
+  p => 1 - Math.pow(1 - p, 2.2),              // szarpnięcie na starcie
+  p => p,                                     // równo
+  p => p + 0.12 * Math.sin(2 * Math.PI * p)   // zastój w środku
+];
+
+let klatka = null;
+
 function animujPasek(ms){
   const w = el("wypelnienie");
-  /* Trzy różne krzywe: raz pasek rusza szybko i zwalnia, raz „zacina się"
-     w połowie. Sam losowy czas to za mało — to krzywa robi wrażenie,
-     że coś naprawdę się wczytuje. */
-  const krzywe = [
-    "cubic-bezier(.25,.8,.4,1)",     // szarpnięcie na starcie
-    "linear",                        // równo
-    "cubic-bezier(.5,.05,.15,.95)"   // zastój w środku
-  ];
+  const krzywa = KRZYWE[Math.floor(Math.random() * KRZYWE.length)];
+  const start = performance.now();
+
+  cancelAnimationFrame(klatka);
   w.style.transition = "none";
   w.style.width = "0%";
-  void w.offsetWidth;                       // wymuszenie przeliczenia układu
-  w.style.transition = `width ${ms}ms ${krzywe[Math.floor(Math.random() * krzywe.length)]}`;
-  w.style.width = "100%";
+
+  /* requestAnimationFrame prosi przeglądarkę o wywołanie funkcji
+     przed każdym odświeżeniem ekranu (ok. 60 razy na sekundę).
+     Sami liczymy, ile czasu minęło — więc animacja jest odporna
+     na wszystko, co robi z CSS-em system operacyjny. */
+  function krok(teraz){
+    const p = Math.min(1, (teraz - start) / ms);
+    w.style.width = (krzywa(p) * 100).toFixed(2) + "%";
+    if (p < 1) klatka = requestAnimationFrame(krok);
+  }
+  klatka = requestAnimationFrame(krok);
 }
 
 function odtworz(wpis, i){
@@ -736,9 +777,30 @@ function nastepny(){
   odtworz(wylosujWpis(), 0);
 }
 
+/* ---------- Tryb animacji ----------
+   iPhone z włączonym „Ogranicz ruch" (Ustawienia → Dostępność → Ruch)
+   zgłasza prefers-reduced-motion. Szanujemy to domyślnie, ale dajemy
+   guzik do włączenia efektów — bo tu one SĄ treścią, nie ozdobą. */
+const SYSTEM_OGRANICZA = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let animacje = !SYSTEM_OGRANICZA;
+let sadPosadzony = false;
+
+function ustawTrybAnimacji(){
+  document.body.classList.toggle("bez-animacji", !animacje);
+  el("przelacznik").textContent = animacje ? "Wyłącz animacje" : "Włącz animacje";
+  if (animacje && !sadPosadzony){ zasadzSad(); sadPosadzony = true; }
+}
+
+if (SYSTEM_OGRANICZA) document.body.classList.add("mozna-przelaczyc");
+
+el("przelacznik").addEventListener("click", () => {
+  animacje = !animacje;
+  ustawTrybAnimacji();
+});
+
 /* ---------- Konfetti po dotknięciu plastra ---------- */
 function wystrzelKonfetti(){
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!animacje) return;
 
   const p = el("plaster").getBoundingClientRect();
   const x0 = p.left + p.width / 2;
@@ -781,7 +843,7 @@ el("panel").addEventListener("keydown", e => {
 });
 
 narysujPlaster();
-zasadzSad();
+ustawTrybAnimacji();
 odswiez();
 odswiezDroge();
 setInterval(odswiez, 1000);
