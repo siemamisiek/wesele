@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maciek &amp; Karolcia — odliczanie do ślubu</title>
+<meta name="theme-color" content="#FBFDF7">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍋</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,600&family=Nunito:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ===== 1. TOKENY — cała paleta i typografia w jednym miejscu ===== */
+:root{
+  --papier:      #FBFDF7;   /* biel z nutą zieleni */
+  --lisc:        #2F6B3C;   /* głęboka zieleń */
+  --lisc-jasny:  #86C06A;   /* młody listek */
+  --cytryna:     #F7CE3C;   /* miąższ */
+  --skorka:      #E5A21C;   /* cień cytryny */
+  --atrament:    #1E3524;   /* tekst (ciemna zieleń zamiast czerni) */
+
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --tekst:   "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --promien: 22px;
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html, body{ margin:0; padding:0; }
+
+body{
+  min-height: 100dvh;
+  font-family: var(--tekst);
+  color: var(--atrament);
+  background:
+    radial-gradient(120% 60% at 50% 0%,   #FFFFFF 0%, var(--papier) 55%),
+    linear-gradient(180deg, var(--papier) 60%, #EEF7E9 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ===== 2. WARSTWA TŁA — spadające cytryny ===== */
+#sad{
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;   /* nie blokuje klikania treści */
+  z-index: 0;
+}
+.spadajaca{
+  position: absolute;
+  top: 0;
+  will-change: transform, opacity;
+  animation-name: spada;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes spada{
+  0%   { transform: translate3d(0, -18vh, 0) rotate(0deg);                    opacity: 0; }
+  10%  { opacity: var(--krycie); }
+  90%  { opacity: var(--krycie); }
+  100% { transform: translate3d(var(--dryf), 112vh, 0) rotate(var(--obrot));  opacity: 0; }
+}
+
+/* ===== 3. UKŁAD ===== */
+main{
+  position: relative;
+  z-index: 1;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 10vh, 5rem) 1.4rem 3rem;
+  text-align: center;
+}
+
+.data-eyebrow{
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--lisc);
+  margin: 0 0 1.1rem;
+}
+
+.imiona{
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 13vw, 3.9rem);
+  line-height: .98;
+  letter-spacing: -.02em;
+  margin: 0;
+}
+.imiona .znak{
+  display: block;
+  font-style: italic;
+  font-weight: 600;
+  font-size: .52em;
+  color: var(--skorka);
+  margin: .18em 0;
+}
+
+.podpis{
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--lisc);
+  margin: 1rem 0 0;
+}
+
+/* ===== 4. SYGNATURA — plaster cytryny z liczbą dni ===== */
+.plaster{
+  position: relative;
+  width: min(76vw, 300px);
+  margin: 2.2rem auto 0;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 14px 26px rgba(47,107,60,.18));
+}
+.plaster svg{ position:absolute; inset:0; width:100%; height:100%; }
+
+.dni-blok{ position: relative; line-height: 1; }
+.dni-liczba{
+  font-family: var(--display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(3.4rem, 19vw, 5.2rem);
+  color: var(--atrament);
+  display: block;
+}
+.dni-slowo{
+  display: block;
+  margin-top: .35rem;
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--lisc);
+}
+
+/* ===== 5. PIGUŁKI: godziny / minuty / sekundy ===== */
+.zegar{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .6rem;
+  margin: 2.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.zegar li{
+  background: #fff;
+  border: 2px solid #E4F0DC;
+  border-radius: var(--promien);
+  padding: .85rem .3rem .7rem;
+  box-shadow: 0 6px 14px rgba(47,107,60,.07);
+}
+.zegar b{
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.zegar span{
+  display: block;
+  margin-top: .4rem;
+  font-size: .66rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--lisc);
+}
+/* mikro-interakcja: sekundy „tykają" */
+#sekundy.tyk{ animation: tyk .45s ease-out; }
+@keyframes tyk{
+  0%  { transform: scale(1);    color: var(--atrament); }
+  30% { transform: scale(1.12); color: var(--skorka); }
+  100%{ transform: scale(1);    color: var(--atrament); }
+}
+
+/* ===== 6. STOPKA ===== */
+.stopka{
+  margin: 2.6rem 0 0;
+  font-size: .8rem;
+  color: #6B8A72;
+}
+.stopka::before{
+  content: "";
+  display: block;
+  width: 46px;
+  height: 2px;
+  margin: 0 auto 1rem;
+  border-radius: 2px;
+  background: var(--lisc-jasny);
+}
+
+/* ===== 7. STAN „JUŻ DZIŚ" ===== */
+.jest-dzien .plaster{ animation: podskok 1.6s ease-in-out infinite; }
+@keyframes podskok{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-8px); } }
+
+/* ===== 8. PANEL KOMUNIKATÓW (styl ekranu ładowania) ===== */
+.panel{
+  margin: 2.3rem 0 0;
+  background: #fff;
+  border: 2px solid #E4F0DC;
+  border-radius: var(--promien);
+  padding: 1rem;
+  box-shadow: 0 6px 14px rgba(47,107,60,.07);
+  text-align: left;
+  min-height: 148px;                 /* stała wysokość = brak skakania układu */
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.panel:active{ transform: scale(.99); }
+
+.plakietka{
+  align-self: flex-start;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: .32rem .65rem;
+  border-radius: 999px;
+  transition: background-color .3s ease, color .3s ease;
+}
+.t-wesele  { background:#EEF7E9; color:#2F6B3C; }
+.t-maciek  { background:#DBEECE; color:#25562F; }
+.t-karolcia{ background:#FDF0C4; color:#8A6206; }
+.t-oboje   { background:linear-gradient(95deg,#DBEECE,#FDF0C4); color:#4A5B2A; }
+.t-leo     { background:#E9EDF7; color:#3B4A6B; }
+
+.komunikat{
+  flex: 1;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  transition: opacity .22s ease, transform .22s ease;
+}
+.komunikat.gasnie{ opacity: 0; transform: translateY(5px); }
+
+.pasek{ height: 8px; border-radius: 999px; background: #EEF7E9; overflow: hidden; }
+.pasek i{
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--lisc-jasny), var(--cytryna));
+}
+
+/* ===== 8b. DROGA OD ZARĘCZYN DO ŚLUBU ===== */
+.droga{ margin: 2.2rem 0 0; }
+.droga-opis{
+  display: flex;
+  justify-content: space-between;
+  gap: .5rem;
+  font-size: .6rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--lisc);
+  margin: 0 0 .5rem;
+}
+.droga-tor{
+  height: 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #E4F0DC;
+  overflow: hidden;
+}
+.droga-tor i{
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--lisc), var(--lisc-jasny) 55%, var(--cytryna));
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+.droga-procent{
+  margin: .6rem 0 0;
+  font-size: .84rem;
+  color: #6B8A72;
+}
+.droga-procent b{ color: var(--atrament); font-weight: 800; }
+
+/* ===== 8c. KONFETTI ===== */
+.konfetti{
+  position: fixed;
+  left: 0; top: 0;
+  pointer-events: none;
+  z-index: 5;
+  will-change: transform, opacity;
+  animation: strzal var(--czas) cubic-bezier(.16,.62,.42,1) forwards;
+}
+@keyframes strzal{
+  0%   { transform: translate3d(var(--x0), var(--y0), 0) scale(.35) rotate(0deg);        opacity: 1; }
+  55%  { transform: translate3d(var(--xs), var(--ys), 0) scale(1)   rotate(calc(var(--obrot) * .6)); opacity: 1; }
+  100% { transform: translate3d(var(--x1), var(--y1), 0) scale(.9)  rotate(var(--obrot)); opacity: 0; }
+}
+
+/* ===== 9. DOSTĘPNOŚĆ ===== */
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+  .spadajaca{ opacity: .35 !important; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="sad" aria-hidden="true"></div>
+
+<main>
+  <p class="data-eyebrow">17 · 07 · 2027 · sobota</p>
+
+  <h1 class="imiona">
+    Maciek
+    <span class="znak">&amp;</span>
+    Karolcia
+  </h1>
+
+  <p class="podpis">biorą ślub</p>
+
+  <div class="plaster" id="plaster">
+    <!-- plaster cytryny rysowany przez JS -->
+    <div class="dni-blok">
+      <span class="dni-liczba" id="dni">—</span>
+      <span class="dni-slowo" id="dni-slowo">dni</span>
+    </div>
+  </div>
+
+  <ul class="zegar">
+    <li><b id="godziny">--</b><span id="godziny-slowo">godzin</span></li>
+    <li><b id="minuty">--</b><span id="minuty-slowo">minut</span></li>
+    <li><b id="sekundy">--</b><span id="sekundy-slowo">sekund</span></li>
+  </ul>
+
+  <section class="droga">
+    <p class="droga-opis">
+      <span>Zaręczyny · 20.02.2025</span>
+      <span>Ślub · 17.07.2027</span>
+    </p>
+    <div class="droga-tor"><i id="droga-wypelnienie"></i></div>
+    <p class="droga-procent">Za sobą macie już <b id="droga-procent">—</b> wspólnej drogi do ołtarza</p>
+  </section>
+
+  <p class="stopka" id="stopka">do początku ceremonii</p>
+
+  <div class="panel" id="panel" role="button" tabindex="0" aria-label="Następny komunikat">
+    <span class="plakietka t-wesele" id="plakietka">Wesele</span>
+    <p class="komunikat" id="komunikat">Rezerwowanie sali...</p>
+    <div class="pasek"><i id="wypelnienie"></i></div>
+  </div>
+</main>
+
+<script>
+/* ==========================================================
+   USTAWIENIA — to jedyna linijka, którą zwykle się zmienia.
+   Kolejność: rok, miesiąc (UWAGA: liczony od 0, więc 6 = lipiec),
+   dzień, godzina, minuta.
+   ========================================================== */
+const SLUB      = new Date(2027, 6, 17, 16, 0, 0);   // 17.07.2027, godz. 16:00
+const ZARECZYNY = new Date(2025, 1, 20, 12, 0, 0);   // 20.02.2025 (miesiąc 1 = luty)
+
+/* ---------- Odmiana polskich rzeczowników ----------
+   Polski ma trzy formy: 1 minuta / 2 minuty / 5 minut.
+   Reguła: 1 → pierwsza forma; końcówka 2–4 (ale nie 12–14) → druga; reszta → trzecia. */
+function odmien(n, [jedna, kilka, wiele]){
+  if (n === 1) return jedna;
+  const ost = n % 10, dwie = n % 100;
+  if (ost >= 2 && ost <= 4 && !(dwie >= 12 && dwie <= 14)) return kilka;
+  return wiele;
+}
+
+const el = id => document.getElementById(id);
+const dwaZnaki = n => String(n).padStart(2, "0");
+let poprzednieSekundy = null;
+
+function odswiezDroge(){
+  const teraz = Date.now();
+  const calosc  = SLUB - ZARECZYNY;
+  const zaSoba  = teraz - ZARECZYNY;
+  /* clamp: przycinamy wynik do przedziału 0–100, żeby pasek nie wyszedł poza tor
+     ani przed zaręczynami, ani po ślubie */
+  const procent = Math.min(100, Math.max(0, zaSoba / calosc * 100));
+
+  el("droga-wypelnienie").style.width = procent + "%";
+  el("droga-procent").textContent = procent.toFixed(1).replace(".", ",") + "%";
+}
+
+function odswiez(){
+  const teraz = new Date();
+  let roznica = Math.floor((SLUB - teraz) / 1000);   // różnica w sekundach
+
+  if (roznica <= 0){
+    document.body.classList.add("jest-dzien");
+    el("dni").textContent = "0";
+    el("dni-slowo").textContent = "dziś!";
+    ["godziny","minuty","sekundy"].forEach(k => el(k).textContent = "00");
+    el("stopka").textContent = "Ten dzień właśnie nadszedł 🍋";
+    return;
+  }
+
+  const dni     = Math.floor(roznica / 86400);
+  const godziny = Math.floor(roznica % 86400 / 3600);
+  const minuty  = Math.floor(roznica % 3600 / 60);
+  const sekundy = roznica % 60;
+
+  el("dni").textContent        = dni;
+  el("dni-slowo").textContent  = odmien(dni, ["dzień", "dni", "dni"]);
+  el("godziny").textContent    = dwaZnaki(godziny);
+  el("minuty").textContent     = dwaZnaki(minuty);
+  el("sekundy").textContent    = dwaZnaki(sekundy);
+
+  el("godziny-slowo").textContent = odmien(godziny, ["godzina", "godziny", "godzin"]);
+  el("minuty-slowo").textContent  = odmien(minuty,  ["minuta",  "minuty",  "minut"]);
+  el("sekundy-slowo").textContent = odmien(sekundy, ["sekunda", "sekundy", "sekund"]);
+
+  // mikro-interakcja: pulsnięcie przy każdej zmianie sekundy
+  if (sekundy !== poprzednieSekundy){
+    const s = el("sekundy");
+    s.classList.remove("tyk");
+    void s.offsetWidth;          // wymuszenie restartu animacji CSS
+    s.classList.add("tyk");
+    poprzednieSekundy = sekundy;
+  }
+}
+
+/* ---------- Plaster cytryny (SVG budowany w JS) ---------- */
+function narysujPlaster(){
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "-100 -100 200 200");
+
+  const kolo = (r, fill) => {
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("r", r); c.setAttribute("fill", fill);
+    return c;
+  };
+  svg.appendChild(kolo(96, "#2F6B3C"));   // skórka
+  svg.appendChild(kolo(90, "#F7CE3C"));   // warstwa miąższu
+  svg.appendChild(kolo(84, "#FFFFFF"));   // biała albedo
+
+  // 8 cząstek miąższu
+  const R = 78, LICZBA = 8, SZCZELINA = 4;
+  for (let i = 0; i < LICZBA; i++){
+    const a1 = (i * 360 / LICZBA + SZCZELINA) * Math.PI / 180;
+    const a2 = ((i + 1) * 360 / LICZBA - SZCZELINA) * Math.PI / 180;
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d",
+      `M 0 0 L ${(R*Math.cos(a1)).toFixed(2)} ${(R*Math.sin(a1)).toFixed(2)}
+       A ${R} ${R} 0 0 1 ${(R*Math.cos(a2)).toFixed(2)} ${(R*Math.sin(a2)).toFixed(2)} Z`);
+    p.setAttribute("fill", "#F7CE3C");
+    svg.appendChild(p);
+  }
+  svg.appendChild(kolo(15, "#FFFFFF"));   // środek, żeby liczba miała oddech
+  el("plaster").prepend(svg);
+}
+
+/* ---------- Spadające cytryny ---------- */
+const CYTRYNA = `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="20" cy="22" rx="13" ry="10.5" fill="#F7CE3C" transform="rotate(-25 20 22)"/>
+  <ellipse cx="20" cy="22" rx="13" ry="10.5" fill="none" stroke="#E5A21C" stroke-width="1.2" transform="rotate(-25 20 22)"/>
+  <path d="M27 10 q7 -4 9 -8 q-7 0 -10 6 z" fill="#86C06A"/>
+</svg>`;
+const LISTEK = `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <path d="M6 30 Q20 4 34 10 Q28 34 6 30 Z" fill="#86C06A"/>
+  <path d="M8 29 Q22 20 32 12" stroke="#2F6B3C" stroke-width="1.3" fill="none"/>
+</svg>`;
+
+const PLASTEREK = `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="15" fill="#F7CE3C" stroke="#E5A21C" stroke-width="2"/>
+  <circle cx="20" cy="20" r="11" fill="#FFFDF2"/>
+  <g stroke="#F7CE3C" stroke-width="4" stroke-linecap="round">
+    <path d="M20 20 L20 11"/><path d="M20 20 L27 14"/><path d="M20 20 L28 22"/>
+    <path d="M20 20 L25 27"/><path d="M20 20 L17 28"/><path d="M20 20 L12 25"/>
+    <path d="M20 20 L11 18"/><path d="M20 20 L14 12"/>
+  </g>
+</svg>`;
+
+function zasadzSad(){
+  const sad = el("sad");
+  const ILE = window.innerWidth < 600 ? 14 : 20;
+  const los = (a, b) => a + Math.random() * (b - a);
+
+  for (let i = 0; i < ILE; i++){
+    const d = document.createElement("div");
+    const rozmiar = los(16, 40);
+    const r = Math.random();
+    d.className = "spadajaca";
+    d.innerHTML = r < .55 ? CYTRYNA : (r < .82 ? LISTEK : PLASTEREK);
+    d.style.left            = los(-4, 98) + "vw";
+    d.style.width           = rozmiar + "px";
+    d.style.height          = rozmiar + "px";
+    d.style.setProperty("--dryf",   los(-70, 70) + "px");
+    d.style.setProperty("--obrot",  los(-320, 320) + "deg");
+    d.style.setProperty("--krycie", los(.30, .75).toFixed(2));
+    d.style.animationDuration = los(15, 30) + "s";
+    d.style.animationDelay    = -los(0, 30) + "s";   // ujemny = start „w połowie lotu"
+    sad.appendChild(d);
+  }
+}
+
+/* ==========================================================
+   KOMUNIKATY „EKRANU ŁADOWANIA"
+
+   Każdy wpis ma:
+     kto   – czyj to świat (steruje kolorem i napisem plakietki)
+     tekst – tablica linijek. Jedna linijka = pojedynczy żart.
+             Kilka linijek = łańcuszek, który leci PO KOLEI
+             (np. sprawdzanie → chłodzenie → schłodzony).
+
+   Dopisywanie własnych: po prostu dołóż obiekt do tablicy.
+   ========================================================== */
+
+const OSOBY = {
+  wesele:   { napis: "Wesele",             klasa: "t-wesele"   },
+  maciek:   { napis: "Maciek",             klasa: "t-maciek"   },
+  karolcia: { napis: "Karolcia",           klasa: "t-karolcia" },
+  oboje:    { napis: "Maciek i Karolcia",  klasa: "t-oboje"    },
+  leo:      { napis: "Leo",                klasa: "t-leo"      }
+};
+
+const KOMUNIKATY = [
+  /* ---------- WESELE ---------- */
+  { kto:"wesele", tekst:["Rezerwowanie sali..."] },
+  { kto:"wesele", tekst:["Liczenie krzeseł po raz siódmy..."] },
+  { kto:"wesele", tekst:["Przesuwanie cioci między stolikami..."] },
+  { kto:"wesele", tekst:["Usadzanie najbardziej konfliktowych gości..."] },
+  { kto:"wesele", tekst:["Rozdzielanie rodzin przy stołach..."] },
+  { kto:"wesele", tekst:["Debatowanie nad smakiem tortu...", "Degustowanie tortu w celach naukowych..."] },
+  { kto:"wesele", tekst:["Wybieranie utworu do pierwszego tańca..."] },
+  { kto:"wesele", tekst:["Ćwiczenie niezdeptania sukni...", "Symulowanie pierwszego tańca..."] },
+  { kto:"wesele", tekst:["Prostowanie winietek..."] },
+  { kto:"wesele", tekst:["Kalibrowanie obrączek...", "Polerowanie obrączek...", "Sprawdzanie, czy obrączki nadal są na miejscu..."] },
+  { kto:"wesele", tekst:["Potwierdzanie fotografa...", "Udawanie naturalności przed fotografem...", "Wybieranie zdjęcia, na którym wszyscy wyszli dobrze..."] },
+  { kto:"wesele", tekst:["Przesłuchiwanie DJ-a...", "Usuwanie „Ona tańczy dla mnie” z playlisty...", "Dodawanie „Ona tańczy dla mnie” z powrotem..."] },
+  { kto:"wesele", tekst:["Szacowanie zapotrzebowania na wódkę...", "Dodawanie zapasu bezpieczeństwa...", "Przeliczanie wódki na osobogodziny..."] },
+  { kto:"wesele", tekst:["Chłodzenie prosecco...", "Weryfikowanie ilości lodu..."] },
+  { kto:"wesele", tekst:["Rezerwowanie noclegów..."] },
+  { kto:"wesele", tekst:["Sprawdzanie, kto znowu nie odpisał na zaproszenie..."] },
+  { kto:"wesele", tekst:["Dodawanie osoby towarzyszącej...", "Usuwanie osoby towarzyszącej...", "Dodawanie osoby towarzyszącej ponownie..."] },
+  { kto:"wesele", tekst:["Aktualizowanie planu stołów po raz siedemnasty...", "Aktualizowanie planu stołów po raz osiemnasty..."] },
+  { kto:"wesele", tekst:["Szukanie zagubionej koperty..."] },
+  { kto:"wesele", tekst:["Składanie serwetek pod kątem prostym..."] },
+  { kto:"wesele", tekst:["Testowanie odporności makijażu na łzy..."] },
+  { kto:"wesele", tekst:["Sprawdzanie prognozy pogody po raz 48...", "Zamawianie dobrej pogody...", "Negocjowanie z pogodą..."] },
+  { kto:"wesele", tekst:["Przygotowywanie planu B...", "Przygotowywanie planu B do planu B..."] },
+  { kto:"wesele", tekst:["Trenowanie krojenia tortu...", "Ostrzenie noża do tortu..."] },
+  { kto:"wesele", tekst:["Synchronizowanie świadków...", "Ładowanie cierpliwości świadków..."] },
+  { kto:"wesele", tekst:["Weryfikowanie, czy wszyscy wiedzą, gdzie mają być...", "Przypominanie wszystkim, gdzie mają być..."] },
+  { kto:"wesele", tekst:["Wybieranie kwiatów, które wyglądają jak „te drugie”..."] },
+  { kto:"wesele", tekst:["Ustalanie różnicy między ecru a ivory...", "Udawanie, że widać różnicę między ecru a ivory..."] },
+  { kto:"wesele", tekst:["Finalizowanie rzeczy, które były już finalne..."] },
+  { kto:"wesele", tekst:["Odhaczanie ostatniej rzeczy...", "Dodawanie trzech nowych rzeczy..."] },
+
+  /* ---------- MACIEK ---------- */
+  { kto:"maciek", tekst:["Analizowanie danych weselnych..."] },
+  { kto:"maciek", tekst:["Czyszczenie listy gości z powtórek..."] },
+  { kto:"maciek", tekst:["Optymalizowanie rozmieszczenia gości..."] },
+  { kto:"maciek", tekst:["Przewidywanie spożycia alkoholu z dokładnością do butelki..."] },
+  { kto:"maciek", tekst:["Estymowanie prawdopodobieństwa poprawin..."] },
+  { kto:"maciek", tekst:["Liczenie średniego czasu od toastu do parkietu..."] },
+  { kto:"maciek", tekst:["Wykrywanie anomalii w budżecie..."] },
+  { kto:"maciek", tekst:["Szukanie korelacji między wódką a tańcem..."] },
+  { kto:"maciek", tekst:["Optymalizowanie trasy do ołtarza..."] },
+  { kto:"maciek", tekst:["Planowanie podróży poślubnej z dokładnością do 4 minut...", "Sprawdzanie 37 alternatywnych połączeń lotniczych..."] },
+  { kto:"maciek", tekst:["Dodawanie jednej małej przesiadki...", "Zamienianie jednej małej przesiadki w czterodniowy city break..."] },
+  { kto:"maciek", tekst:["Otwieranie map...", "Zapisywanie miejsca „na kiedyś”..."] },
+  { kto:"maciek", tekst:["Udawanie zaskoczonego nową ciekawostką...", "Udowadnianie, że już tam był..."] },
+  { kto:"maciek", tekst:["Znanie odpowiedzi...", "Znanie odpowiedzi na pytanie, którego jeszcze nie zadano..."] },
+  { kto:"maciek", tekst:["Zachowywanie pokerowej twarzy...", "Tasowanie kart awaryjnych..."] },
+  { kto:"maciek", tekst:["Sprawdzanie kursu na własne zwycięstwo...", "Wygrywanie bez większego wysiłku..."] },
+  { kto:"maciek", tekst:["Losowanie szczęścia: 100/100..."] },
+  { kto:"maciek", tekst:["Zwiększanie współczynnika farta..."] },
+  { kto:"maciek", tekst:["Ograniczanie wysiłku do minimum...", "Osiąganie najlepszego wyniku..."] },
+  { kto:"maciek", tekst:["Rezerwowanie kortu...", "Kalibrowanie forhendu...", "Ćwiczenie weselnego backhandu..."] },
+  { kto:"maciek", tekst:["Dołączanie chłopaków do gry...", "Sprawdzanie, czy Tymek jest na ławeczce...", "Chłodzenie napoju na ławeczkę..."] },
+  { kto:"maciek", tekst:["Wykrywanie warzyw w menu...", "Usuwanie warzyw z talerza...", "Potwierdzanie, że frytki są warzywem..."] },
+  { kto:"maciek", tekst:["Wydłubywanie brukselki z menu..."] },
+  { kto:"maciek", tekst:["Klasyfikowanie sałaty jako dekoracji..."] },
+  { kto:"maciek", tekst:["Zdobywanie aprobaty Leo...", "Głaskanie Leo zgodnie z protokołem...", "Utrzymywanie pozycji ulubionego człowieka Leo..."] },
+  { kto:"maciek", tekst:["Udawanie, że to nic takiego...", "Pozostawanie podejrzanie spokojnym..."] },
+  { kto:"maciek", tekst:["Podnoszenie statystyki „Mąż” do poziomu maksymalnego..."] },
+
+  /* ---------- KAROLCIA ---------- */
+  { kto:"karolcia", tekst:["Wybieranie kreacji...", "Odrzucanie zbyt mało spektakularnej kreacji...", "Dodawanie jeszcze odrobiny blasku..."] },
+  { kto:"karolcia", tekst:["Sprawdzanie, czy wszyscy patrzą..."] },
+  { kto:"karolcia", tekst:["Ładowanie efektu WOW...", "Nakładanie warstwy glamour...", "Polerowanie aury..."] },
+  { kto:"karolcia", tekst:["Dopasowywanie torebki do torebki...", "Wybieranie torebki awaryjnej..."] },
+  { kto:"karolcia", tekst:["Sprawdzanie, czy marka jest wystarczająco droga..."] },
+  { kto:"karolcia", tekst:["Optymalizowanie powierzchni błyszczenia..."] },
+  { kto:"karolcia", tekst:["Testowanie kosmetyków metodą „jeszcze trochę”...", "Ustalanie, czy potrzebny jest jeszcze jeden kosmetyk...", "Dodawanie jeszcze jednego kosmetyku..."] },
+  { kto:"karolcia", tekst:["Finalizowanie makijażu...", "Poprawianie finalnego makijażu...", "Finalizowanie poprawionego finalnego makijażu..."] },
+  { kto:"karolcia", tekst:["Otwieranie drzwi...", "Wchodzenie oknem...", "Otwieranie kolejnego okna...", "Domykanie interesu..."] },
+  { kto:"karolcia", tekst:["Sprzedawanie pomysłu wszystkim dookoła..."] },
+  { kto:"karolcia", tekst:["Sprzedawanie siostry po raz pierwszy...", "Sprzedawanie siostry po raz drugi...", "Sprzedawanie siostry po raz trzeci...", "Sprawdzanie, czy siostra już się zorientowała..."] },
+  { kto:"karolcia", tekst:["Negocjowanie ceny bukietu...", "Negocjowanie ceny po wynegocjowaniu ceny...", "Znajdowanie lepszej oferty..."] },
+  { kto:"karolcia", tekst:["Wyciskanie rabatu z rzeczywistości..."] },
+  { kto:"karolcia", tekst:["Odpalanie trybu „jak nie drzwiami, to oknem”...", "Zwiększanie determinacji do 110%..."] },
+  { kto:"karolcia", tekst:["Przygotowywanie powiedzonka bez kontekstu..."] },
+  { kto:"karolcia", tekst:["Najebywanie się jak stokrotka..."] },
+  { kto:"karolcia", tekst:["Złocenie dupy...", "Złocenie dupy na perłowo...", "Sprawdzanie jakości perłowego złocenia..."] },
+  { kto:"karolcia", tekst:["Planowanie kontrolowanego chaosu w Azji..."] },
+  { kto:"karolcia", tekst:["Pakowanie plecaka na 17 kilogramów...", "Usuwanie połowy rzeczy z plecaka...", "Dokładanie trzech kosmetyczek..."] },
+  { kto:"karolcia", tekst:["Rezerwowanie noclegu znalezionego 14 minut wcześniej..."] },
+  { kto:"karolcia", tekst:["Wybieranie drogi, której nie ma na mapie..."] },
+  { kto:"karolcia", tekst:["Szukanie rybek...", "Zakładanie maski do snorkelingu...", "Wchodzenie do wody na tyle, ile trzeba...", "Unikanie niepotrzebnego pływania...", "Zachwycanie się rafą..."] },
+  { kto:"karolcia", tekst:["Kochanie Leo bez wzajemności...", "Próba przekupienia Leo...", "Akceptowanie zdrady Leo..."] },
+  { kto:"karolcia", tekst:["Sprawdzanie, czy Leo nadal woli Maćka...", "Udawanie, że to absolutnie nie boli..."] },
+  { kto:"karolcia", tekst:["Przygotowywanie wejścia godnego Gwiazdy Wyjazda..."] },
+
+  /* ---------- OBOJE ---------- */
+  { kto:"oboje", tekst:["Łączenie gospodarstw domowych...", "Synchronizowanie Państwa Młodych..."] },
+  { kto:"oboje", tekst:["Aktualizowanie statusu związku...", "Przydzielanie wspólnego nazwiska..."] },
+  { kto:"oboje", tekst:["Generowanie wspólnej przyszłości..."] },
+  { kto:"oboje", tekst:["Ustalanie następnej podróży...", "Planowanie podróży, zanim skończy się poprzednia..."] },
+  { kto:"oboje", tekst:["Porównywanie plecaków..."] },
+  { kto:"oboje", tekst:["Rezerwowanie lotów do Azji...", "Dodawanie kolejnej wyspy..."] },
+  { kto:"oboje", tekst:["Szukanie miejsca z rybkami i tanim piwem..."] },
+  { kto:"oboje", tekst:["Sprawdzanie dostępności Changa...", "Chłodzenie Changa...", "Chang schłodzony..."] },
+  { kto:"oboje", tekst:["Sprawdzanie dostępności Bintanga...", "Chłodzenie Bintanga...", "Bintang schłodzony..."] },
+  { kto:"oboje", tekst:["Negocjowanie limitu kosmetyków w bagażu...", "Ignorowanie limitu kosmetyków w bagażu...", "Przenoszenie kosmetyków do plecaka Maćka..."] },
+  { kto:"oboje", tekst:["Usuwanie warzyw ze wspólnego menu...", "Dodawanie rybek do planu podróży..."] },
+  { kto:"oboje", tekst:["Ustalanie, kto dziś karmi Leo..."] },
+  { kto:"oboje", tekst:["Sprawdzanie rankingu ludzi według Leo...", "Potwierdzanie zwycięstwa Maćka w rankingu Leo...", "Składanie protestu przez Karolcię...", "Odrzucanie protestu przez Leo..."] },
+  { kto:"oboje", tekst:["Kupowanie przychylności Leo...", "Oczekiwanie na rozpatrzenie wniosku przez Leo..."] },
+  { kto:"oboje", tekst:["Budowanie wspólnej bazy..."] },
+  { kto:"oboje", tekst:["Dodawanie torebek do budżetu...", "Usuwanie torebek z budżetu...", "Dodawanie torebek z powrotem do budżetu..."] },
+  { kto:"oboje", tekst:["Optymalizowanie budżetu pod kolejną podróż...", "Zamienianie oszczędności na bilety lotnicze..."] },
+  { kto:"oboje", tekst:["Kalibrowanie wspólnego poziomu chaosu..."] },
+  { kto:"oboje", tekst:["Łączenie pokerowej twarzy z Gwiazdą Wyjazda..."] },
+  { kto:"oboje", tekst:["Równoważenie spokoju Maćka z determinacją Karolci..."] },
+  { kto:"oboje", tekst:["Przeliczanie farta Maćka na wspólne gospodarstwo..."] },
+  { kto:"oboje", tekst:["Zwiększanie szczęścia rodziny o 200%..."] },
+  { kto:"oboje", tekst:["Przygotowywanie fabuły na kolejny sezon..."] },
+  { kto:"oboje", tekst:["Ładowanie poziomu: „I żyli długo i szczęśliwie”..."] }
+];
+
+/* Krótkie wtręty — pojawiają się rzadziej i znikają szybciej */
+const DROBIAZGI = [
+  { kto:"leo",      tekst:["Leo ocenia..."] },
+  { kto:"leo",      tekst:["Leo nie zatwierdził..."] },
+  { kto:"leo",      tekst:["Leo zatwierdził Maćka..."] },
+  { kto:"leo",      tekst:["Leo nadal nie lubi ludzi..."] },
+  { kto:"maciek",   tekst:["Macio już wie..."] },
+  { kto:"maciek",   tekst:["Poker face aktywny..."] },
+  { kto:"maciek",   tekst:["Szczęście Maćka aktywne..."] },
+  { kto:"maciek",   tekst:["Brukselka wykryta...", "Brukselka usunięta..."] },
+  { kto:"maciek",   tekst:["Warzywa pominięte..."] },
+  { kto:"maciek",   tekst:["Wszystko idzie zgodnie z planem Maćka..."] },
+  { kto:"karolcia", tekst:["Karolcia już zdecydowała..."] },
+  { kto:"karolcia", tekst:["Torebka dodana..."] },
+  { kto:"karolcia", tekst:["Gwiazda Wyjazda aktywna..."] },
+  { kto:"karolcia", tekst:["Wszystko idzie niezgodnie z planem Karolci. Czyli zgodnie z planem..."] },
+  { kto:"oboje",    tekst:["Rybki znalezione..."] },
+  { kto:"oboje",    tekst:["Budżet zaktualizowany..."] }
+];
+
+const PERELKA = { kto:"wesele", tekst:["Trwa..."] };   // 1% szansy, celowo idiotyczne
+
+/* ---------- Silnik ---------- */
+let kolejka = [];      // przetasowana talia wpisów
+let licznikCzasu = null;
+
+/* Tasowanie Fishera-Yatesa: przechodzimy tablicę od końca i każdy element
+   zamieniamy z losowym wcześniejszym. Dzięki „talii" zamiast czystego losowania
+   ten sam żart nie wraca dwa razy pod rząd. */
+function tasuj(t){
+  for (let i = t.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [t[i], t[j]] = [t[j], t[i]];
+  }
+  return t;
+}
+
+function wylosujWpis(){
+  const r = Math.random();
+  if (r < 0.01) return PERELKA;
+  if (r < 0.22) return DROBIAZGI[Math.floor(Math.random() * DROBIAZGI.length)];
+  if (kolejka.length === 0) kolejka = tasuj([...KOMUNIKATY]);
+  return kolejka.pop();
+}
+
+function ustawPlakietke(kto){
+  const osoba = OSOBY[kto];
+  const p = el("plakietka");
+  p.className = "plakietka " + osoba.klasa;
+  p.textContent = osoba.napis;
+}
+
+function wypiszLinie(tekst){
+  const k = el("komunikat");
+  k.classList.add("gasnie");
+  setTimeout(() => { k.textContent = tekst; k.classList.remove("gasnie"); }, 220);
+}
+
+function animujPasek(ms){
+  const w = el("wypelnienie");
+  /* Trzy różne krzywe: raz pasek rusza szybko i zwalnia, raz „zacina się"
+     w połowie. Sam losowy czas to za mało — to krzywa robi wrażenie,
+     że coś naprawdę się wczytuje. */
+  const krzywe = [
+    "cubic-bezier(.25,.8,.4,1)",     // szarpnięcie na starcie
+    "linear",                        // równo
+    "cubic-bezier(.5,.05,.15,.95)"   // zastój w środku
+  ];
+  w.style.transition = "none";
+  w.style.width = "0%";
+  void w.offsetWidth;                       // wymuszenie przeliczenia układu
+  w.style.transition = `width ${ms}ms ${krzywe[Math.floor(Math.random() * krzywe.length)]}`;
+  w.style.width = "100%";
+}
+
+function odtworz(wpis, i){
+  const bazowy = wpis.tekst.length > 1 ? 2600 : 3800;   // łańcuszki lecą szybciej
+  const czas   = Math.round(bazowy * (0.75 + Math.random() * 1.0));  // 0,75× – 1,75×
+  ustawPlakietke(wpis.kto);
+  wypiszLinie(wpis.tekst[i]);
+  animujPasek(czas);
+  licznikCzasu = setTimeout(() => {
+    if (i + 1 < wpis.tekst.length) odtworz(wpis, i + 1);
+    else nastepny();
+  }, czas);
+}
+
+function nastepny(){
+  clearTimeout(licznikCzasu);
+  odtworz(wylosujWpis(), 0);
+}
+
+/* ---------- Konfetti po dotknięciu plastra ---------- */
+function wystrzelKonfetti(){
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const p = el("plaster").getBoundingClientRect();
+  const x0 = p.left + p.width / 2;
+  const y0 = p.top  + p.height / 2;
+  const los = (a, b) => a + Math.random() * (b - a);
+  const ksztalty = [CYTRYNA, LISTEK, PLASTEREK];
+
+  for (let i = 0; i < 26; i++){
+    const k = document.createElement("div");
+    const rozmiar = los(12, 26);
+    const kat = los(0, Math.PI * 2);
+    const sila = los(90, 230);
+
+    k.className = "konfetti";
+    k.innerHTML = ksztalty[Math.floor(Math.random() * ksztalty.length)];
+    k.style.width = k.style.height = rozmiar + "px";
+
+    const dx = Math.cos(kat) * sila;
+    const dy = Math.sin(kat) * sila - 60;      // lekkie podbicie do góry
+
+    k.style.setProperty("--x0", (x0 - rozmiar / 2) + "px");
+    k.style.setProperty("--y0", (y0 - rozmiar / 2) + "px");
+    k.style.setProperty("--xs", (x0 - rozmiar / 2 + dx * .7) + "px");
+    k.style.setProperty("--ys", (y0 - rozmiar / 2 + dy)      + "px");
+    k.style.setProperty("--x1", (x0 - rozmiar / 2 + dx)      + "px");
+    k.style.setProperty("--y1", (y0 - rozmiar / 2 + dy + los(280, 460)) + "px");  // grawitacja
+    k.style.setProperty("--obrot", los(-540, 540) + "deg");
+    k.style.setProperty("--czas", los(1100, 1900) + "ms");
+
+    document.body.appendChild(k);
+    k.addEventListener("animationend", () => k.remove());   // sprzątanie po sobie
+  }
+}
+
+el("plaster").addEventListener("click", wystrzelKonfetti);
+
+el("panel").addEventListener("click", nastepny);
+el("panel").addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === " "){ e.preventDefault(); nastepny(); }
+});
+
+narysujPlaster();
+zasadzSad();
+odswiez();
+odswiezDroge();
+setInterval(odswiez, 1000);
+setInterval(odswiezDroge, 60000);   // postęp zmienia się wolno — minuta wystarczy
+nastepny();
+</script>
+</body>
+</html>
